@@ -18,12 +18,14 @@ pipeline {
             steps {
                 script {
                     junit 'reports/**/*.xml'
+                    cmd 'echo test'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
+                    cmd 'echo deploy'
                 }
             }
         }
