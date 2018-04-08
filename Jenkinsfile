@@ -8,8 +8,6 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    //library "edmi-pipeline-lib-core@${branchName}"
-                    //edmiBuild(tasks: 'clean build dockerBuild')
                     println 'hello build'
                     bat 'gradlew build --info'
                 }
@@ -18,7 +16,9 @@ pipeline {
         stage('Package') {
             steps {
                 script {
+                    library "jenkins-pipeline-lib-core"
                     println 'hello package'
+                    testLib("some-args")
                 }
             }
         }
