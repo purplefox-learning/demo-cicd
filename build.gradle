@@ -11,6 +11,15 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'groovy'
 
+//the distribution plugin facilitates building archives that serve as distributions of the project
+apply plugin: 'distribution'
+
+// maven-publish is one of the most essential plugin
+// with this applied, we define a publication called mavenJava (see below) in the publishing{ publications{} } block
+// which is then used by assemble/publishToMavenLocal/artifactoryPublish tasks
+// https://docs.gradle.org/current/userguide/publishing_maven.html
+apply plugin: 'maven-publish'
+
 sourceSets {
     main {
         java { srcDir 'src/main/java' }
@@ -24,8 +33,111 @@ sourceSets {
 
 sourceCompatibility = 1.8
 
+//this line builds a simple jar, xxx.jar, which can be found at build/libs
+jar {
+    enabled = true
+    manifest {
+        attributes (
+            'Main-Class': 'com.ycm.demo.Calculator'
+        )
+    }
+}
+
+//this task specify how the jar can be created
+//when we call gradle with assemble or publishToMavenLocal with this sourceJar task registered,
+//then the xxx-source.jar will be created in the corresponding directory
+task sourceJar(type: Jar) {         //produce a jar that contain only sources, e.g. xxx-sources.jar
+    classifier "sources"
+    from sourceSets.main.allJava    //sourceSets.main.allJava is preferred than main.java
+    //from sourceSets.main.allSource works too
+}
+
+//this task specify how the jar can be created
+//because this task depends on javadoc task, the execution of javadoc will create build/docs folder first
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+//this is to support 'assemble' task. when we run 'gradle assemble', both sourceJar and javadocJar will be called
+//the specification in both tasks will be used by 'assemble' task to generate the jars in
+//  build/libs/xxx-sources.jar
+//  build/libs/xxx-javadoc.jar
+//seems the simple jar and uber/fat jar is generated automatically
+artifacts {
+    archives sourceJar
+    archives javadocJar
+}
+
+//create a single zip/tar file with the files specified in the contents{} block
+//three tasks are supported by the distribution plugin: distTar, distZip, assembleDist
+//in this example, we want to include both fat/executable jar and javadoc in the distribution
+//but usually distTar is executed before javadocJar and sourceJar,
+//so we explicitly declare that distTar must run after javadocJar and sourceJar
+distributions {
+    main {
+        baseName = artifactName
+        contents {
+            into('/') {
+                from("$projectDir/build/libs") {
+                    include '*-exec.jar'
+                    include '*-javadoc.jar'
+                    fileMode 0755
+                }
+                //from('provisioning')
+            }
+        }
+    }
+}
+
+//this task specify some details on how we want to generate a tar ball file
+distTar {
+    compression Compression.GZIP
+    extension "tar.gz"
+}
+distTar.mustRunAfter javadocJar, sourceJar
+
+//whatever artifacts defined here will get published to
+//  rootDir\build\libs              by command 'gradlew build assemble'
+//  C:\Users\xxx\.m2\repository\... by command 'gradlew build publishToMavenLocal'
+//  artifactory server              by command 'gradlew build artifactoryPublish'
+publishing {    //publishing is powered by maven-publish plugin
+    publications {
+        mavenJava(MavenPublication) {   //the name of our MavenPublication instance, we name it as mavenJava
+            from components.java    //publish the simple jar, xxx.jar
+            //artifact bootJar        //publish the artifact built by bootJar task (uber/fat/executable jar)
+            artifact sourceJar      //publish the artifact built by sourceJar task
+            artifact javadocJar     //publish the artifact built by javadocJar task
+            artifact distTar        //publish the artifact built by distTar task
+
+            //optionally we may have
+            //artifact ('README.txt') {
+            //    classifier = 'README'
+            //    extension  = 'txt'
+            //}
+        }
+    }
+
+    //declare repositories for publications to be deployed to
+    //mavenLocal is automatically added, so no need to declare it here
+    //for artifactory, we use seperate plugin to handle the publishing
+    //so here we only declare all non-artifactory non-mavenLocal maven repos
+
+    //repositories {
+    //    maven {
+    //        url "http://my.company.com/mavenrepo"
+    //        credentials {
+    //            username 'xxx'
+    //            password 'someAbcPassword'  //defined in ext{} block
+    //        }
+    //    }
+    //}
+}
+
+
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.20'
 
     testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
 }
+
