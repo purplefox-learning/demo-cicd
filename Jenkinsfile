@@ -5,27 +5,33 @@ pipeline {
     agent any
 
     stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    bat 'echo welcome to the little CICD world...'
+                    println 'initializing for cicd build...'
+                }
+            }
+        }
         stage('Build') {
             steps {
                 script {
-                    println 'hello build'
-                    bat 'gradlew --info build -x test'
+                    library "jenkins-pipeline-lib-core@master"  //standard way to import a library
+                    gradleBuild(tasks: 'clean build', outputLevel: 'debug', includeTest:'false')
                 }
             }
         }
         stage('Package') {
             steps {
                 script {
-                    library "jenkins-pipeline-lib-core@master"  //standard way to import a library
-                    println 'hello package'
-                    gradleBuild(tasks: 'clean build', level: 'info', test:'true')
+                    println 'dummy package'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    println 'hello deploy'
+                    println 'dummy deploy'
                 }
             }
         }
