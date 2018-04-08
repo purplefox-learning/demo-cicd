@@ -9,7 +9,7 @@ pipeline {
             steps {
                 script {
                     println 'hello build'
-                    bat 'gradlew build --info'
+                    bat 'gradlew --info build -x test'
                 }
             }
         }
