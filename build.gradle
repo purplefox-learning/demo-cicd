@@ -1,0 +1,31 @@
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+group = artifactGroup
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+sourceSets {
+    main {
+        java { srcDir 'src/main/java' }
+        resources { srcDir 'src/main/resources' }
+    }
+    test {
+        groovy { srcDir 'src/test/groovy' }
+        resources { srcDir 'src/test/resources' }
+    }
+}
+
+sourceCompatibility = 1.8
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.16.20'
+
+    testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-2"
+}
