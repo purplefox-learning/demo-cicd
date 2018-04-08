@@ -10,22 +10,22 @@ pipeline {
                 script {
                     //library "edmi-pipeline-lib-core@${branchName}"
                     //edmiBuild(tasks: 'clean build dockerBuild')
-                    cmd 'echo aaa'
+                    println 'hello build'
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    junit 'reports/**/*.xml'
-                    cmd 'echo test'
+                    //junit 'reports/**/*.xml'
+                    println 'hello test'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    cmd 'echo deploy'
+                    println 'hello deploy'
                 }
             }
         }
