@@ -11,7 +11,7 @@ pipeline {
                     //library "edmi-pipeline-lib-core@${branchName}"
                     //edmiBuild(tasks: 'clean build dockerBuild')
                     println 'hello build'
-                    bat 'dir'
+                    bat 'gradlew build'
                 }
             }
         }
@@ -20,7 +20,7 @@ pipeline {
                 script {
                     //junit 'reports/**/*.xml'
                     println 'hello test'
-                    //gradlew test
+                    bat 'gradlew test'
                 }
             }
         }

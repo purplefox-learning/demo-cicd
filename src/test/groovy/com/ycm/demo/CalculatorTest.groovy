@@ -13,6 +13,6 @@ class CalculatorTest extends Specification {
         exp     | result
         "1+2"   | 3.0
         "2+3"   | 5.0
-        //"2+5"   | 7.0
+        "2+5"   | 7.0
     }
 }
