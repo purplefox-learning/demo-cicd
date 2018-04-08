@@ -11,8 +11,7 @@ pipeline {
                     //library "edmi-pipeline-lib-core@${branchName}"
                     //edmiBuild(tasks: 'clean build dockerBuild')
                     println 'hello build'
-                    bat 'gradlew build'
-                    junit 'reports/**/*.xml'
+                    bat 'gradlew build --info'
                 }
             }
         }
