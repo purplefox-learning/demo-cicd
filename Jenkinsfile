@@ -11,16 +11,15 @@ pipeline {
                     //library "edmi-pipeline-lib-core@${branchName}"
                     //edmiBuild(tasks: 'clean build dockerBuild')
                     println 'hello build'
-                    bat 'gradlew build -x test'
+                    bat 'gradlew build'
+                    junit 'reports/**/*.xml'
                 }
             }
         }
-        stage('Test') {
+        stage('Package') {
             steps {
                 script {
-                    //junit 'reports/**/*.xml'
-                    println 'hello test'
-                    bat 'gradlew test'
+                    println 'hello package'
                 }
             }
         }
