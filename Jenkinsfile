@@ -16,7 +16,7 @@ pipeline {
         stage('Package') {
             steps {
                 script {
-                    library "jenkins-pipeline-lib-core"
+                    library "jenkins-pipeline-lib-core@master"
                     println 'hello package'
                     testLib("some-args")
                 }
