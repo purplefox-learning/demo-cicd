@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     library "jenkins-pipeline-lib-core@master"  //standard way to import a library
-                    gradleBuild(tasks: 'clean build', outputLevel: 'debug', includeTest:'false')
+                    gradleBuild(tasks: 'clean build', outputLevel: 'info', includeTest:'false')
                 }
             }
         }
