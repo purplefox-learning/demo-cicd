@@ -1,6 +1,7 @@
 //buildscript goes first
 buildscript {
     ext {
+        springBootVersion = '2.0.0.RELEASE'
     }
 
     repositories {
@@ -10,6 +11,8 @@ buildscript {
     }
 
     dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.4.RELEASE"
     }
 }
 
@@ -29,6 +32,10 @@ apply plugin: 'distribution'
 // which is then used by assemble/publishToMavenLocal/artifactoryPublish tasks
 // https://docs.gradle.org/current/userguide/publishing_maven.html
 apply plugin: 'maven-publish'
+
+//spring boot and its dep mgmt module
+apply plugin: 'org.springframework.boot'
+apply plugin: "io.spring.dependency-management"
 
 
 repositories {
@@ -58,6 +65,17 @@ sourceSets {
 }
 
 sourceCompatibility = 1.8
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Edgware.SR3"
+    }
+}
+
+springBoot {
+    //this line adds META-INF/build-info.properties in the simple jar
+    buildInfo()
+}
 
 //this line builds a simple jar, xxx.jar, which can be found at build/libs
 jar {
@@ -93,6 +111,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourceJar
     archives javadocJar
+}
+
+bootJar {               //from spring boot 2.0, bootJar/bootWar replaces bootRepackage
+    classifier = 'exec' //this line ask gradle to use 'exec' as postfix, xxx-exec.jar so that wont conflict with xxx.jar
+    launchScript()      //this line builds a uber/executable jar, whic can be found at bulid/libs
 }
 
 //create a single zip/tar file with the files specified in the contents{} block
@@ -131,7 +154,7 @@ publishing {    //publishing is powered by maven-publish plugin
     publications {
         mavenJava(MavenPublication) {   //the name of our MavenPublication instance, we name it as mavenJava
             from components.java    //publish the simple jar, xxx.jar
-            //artifact bootJar        //publish the artifact built by bootJar task (uber/fat/executable jar)
+            artifact bootJar        //publish the artifact built by bootJar task (uber/fat/executable jar)
             artifact sourceJar      //publish the artifact built by sourceJar task
             artifact javadocJar     //publish the artifact built by javadocJar task
             artifact distTar        //publish the artifact built by distTar task
