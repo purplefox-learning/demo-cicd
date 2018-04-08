@@ -11,7 +11,7 @@ pipeline {
                     //library "edmi-pipeline-lib-core@${branchName}"
                     //edmiBuild(tasks: 'clean build dockerBuild')
                     println 'hello build'
-                    gradle test
+                    ./gradlew test
                 }
             }
         }
