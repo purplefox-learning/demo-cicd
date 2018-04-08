@@ -16,9 +16,9 @@ pipeline {
         stage('Package') {
             steps {
                 script {
-                    library "jenkins-pipeline-lib-core@master"
+                    library "jenkins-pipeline-lib-core@master"  //standard way to import a library
                     println 'hello package'
-                    testLib("some-args")
+                    gradleBuild(tasks: 'clean build', level: 'info', test:'true')
                 }
             }
         }
