@@ -7,12 +7,14 @@ class CalculatorTest extends Specification {
     def "hello"() {
         expect:
         Calculator c = new Calculator();
-        c.calculate(exp) == result
+        c.calculate(exp) == expectedResult
 
         where:
-        exp     | result
+        exp     | expectedResult
         "1+2"   | 3.0
         "2+3"   | 5.0
         "2+5"   | 7.0
     }
+
+
 }
